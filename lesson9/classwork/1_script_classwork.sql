@@ -13,7 +13,7 @@ CREATE TABLE roles(
 CREATE TABLE users(
     id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
     email varchar(32) NOT NULL,
-    role_id int NOT NULL, -- Добавлена запятая
+    role_id int NOT NULL, 
     
     CONSTRAINT FK_users_role FOREIGN KEY(role_id) REFERENCES roles(id)
 );
@@ -558,7 +558,7 @@ DROP TABLE productse;
 
 
 
---    =============
+--    =============ss
 
 CREATE  TABLE  productse (
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
