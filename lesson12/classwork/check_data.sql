@@ -178,11 +178,19 @@ FROM groups g
 JOIN group_student gs ON g.id = gs.group_id
 JOIN pair_student ps ON gs.student_id = ps.student_id
 GROUP BY g.title
---HAVING AVG(CAST(ps.status AS FLOAT)) < 0.8;
+HAVING AVG(CAST(ps.status AS FLOAT)) < 0.8;
 
 
 
-
+--Вывести список ДЗ, по которым крайний срок (deadline) прошел, а проверенных решений (где grade IS NULL) больше половины.
+SELECT 
+    h.title,
+    h.deadline_date
+FROM homeworks h
+JOIN homeworks_solutions hs ON h.id = hs.homework_id
+WHERE h.deadline_date < GETDATE()
+GROUP BY h.title, h.deadline_date
+HAVING COUNT(CASE WHEN hs.grade IS NULL THEN 1 END) > (COUNT(hs.id) / 2);
 
 
 
