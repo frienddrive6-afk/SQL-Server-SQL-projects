@@ -3,10 +3,10 @@
 
 
 
-
+--  РАСПИСАНИЕ 
 CREATE TABLE schedule_items(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
-	number tunyint NOT NULL,
+	number tinyint NOT NULL,
 	item_start time NOT NULL,
 	item_end time NOT NULL,
 	status tinyint DEFAULT(0) NOT NULL
@@ -14,6 +14,7 @@ CREATE TABLE schedule_items(
 );
 
 
+--  ПРЕДМЕТЫ
 CREATE TABLE subjects(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	title nvarchar(256) NOT NULL,
@@ -22,6 +23,8 @@ CREATE TABLE subjects(
 	
 );
 
+
+--  ГРУППЫ
 CREATE TABLE groups (
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	title nvarchar(128) NOT NULL,
@@ -36,11 +39,14 @@ CREATE TABLE groups (
 --permissio_user
 --permission_role
 
+
+-- РОЛИ
 CREATE TABLE roles(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	title nvarchar(64) UNIQUE NOT NULL
 );
 
+-- ПРАВА
 CREATE TABLE permissions(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	title nvarchar(64) UNIQUE NOT NULL
@@ -48,7 +54,7 @@ CREATE TABLE permissions(
 
 
 
-
+-- ПОЛЬЗОВАТЕЛИ
 CREATE TABLE users(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	email varchar(32) UNIQUE NOT NULL,
@@ -58,6 +64,7 @@ CREATE TABLE users(
 );
 
 
+--  ПРОМЕЖУТОЧНАЯ ТАБЛИЦА ДОСТУПА
 CREATE TABLE role_user(
 	user_id int NOT NULL,
 	role_id int NOT NULL,
@@ -69,7 +76,7 @@ CREATE TABLE role_user(
 );
 
 
-
+--  ПРОМЕЖУТОЧНАЯ ТАБЛИЦА ДОСТУПА
 CREATE TABLE permission_role(
 	role_id int NOT NULL,
 	permission_id int NOT NULL,
@@ -80,7 +87,7 @@ CREATE TABLE permission_role(
 	CONSTRAINT FK_pr_permission FOREIGN KEY(permission_id) REFERENCES permissions(id) ON DELETE CASCADE
 );
 
-
+--  ПРОМЕЖУТОЧНАЯ ТАБЛИЦА ДОСТУПА
 CREATE TABLE permission_user(
 	user_id int NOT NULL,
 	permission_id int NOT NULL,
@@ -93,7 +100,7 @@ CREATE TABLE permission_user(
 
 
 
-
+--  ПЕРСОНАЛИИ
 CREATE TABLE teachers(
 	id int PRIMARY KEY NOT NULL,	
 	first_name nvarchar(32) NOT NULL,
@@ -118,12 +125,12 @@ CREATE TABLE students(
 
 
 
-
+--  ПАРЫ
 CREATE TABLE pairs(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	pair_date date NOT NULL,
 	schedule_item_id int NOT NULL,
-	subject_id NOT NULL,
+	subject_id int NOT NULL,
 	theme nvarchar(256) NOT NULL,
 	teacher_id int,
 	teacher_status tinyint,    -- online / offline
@@ -140,7 +147,7 @@ CREATE TABLE pairs(
 
 
 
-
+--  СВЯЗИ ГРУПП 
 CREATE TABLE groups_pair(
 	group_id int NOT NULL,
 	pair_id int NOT NULL,
@@ -152,7 +159,7 @@ CREATE TABLE groups_pair(
 	CONSTRAINT FK_groups_pair_pairs FOREIGN KEY(pair_id) REFERENCES pairs(id)
 );
 
-
+--  СВЯЗИ СТУДЕНТОВ
 CREATE TABLE group_student (
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	group_id int NOT NULL,
@@ -170,7 +177,7 @@ CREATE TABLE group_student (
 
 
 
-
+-- ПОСЕЩАЕМОСТЬ
 CREATE TABLE pair_student (
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	pair_id int NOT NULL,
@@ -189,7 +196,7 @@ CREATE TABLE pair_student (
 
 
 
-
+--   ОЦЕНКИ ЗА УРОК
 CREATE TABLE pair_grades(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	pair_student_id int NOT NULL,
@@ -203,6 +210,9 @@ CREATE TABLE pair_grades(
 
 
 
+
+
+--  ДОМАШНИЕ ЗАДАНИЯ 
 CREATE TABLE homeworks(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	pair_id int NOT NULL,
@@ -215,20 +225,20 @@ CREATE TABLE homeworks(
 );
 
 
-
+--  ПРОМЕЖУТАЧНАЯ ТАБЛИЦА ДЛЯ ДЗ
 CREATE TABLE homeworks_solutions(
 	id int PRIMARY KEY IDENTITY(1, 1) NOT NULL,
 	homework_id int NOT NULL,
 	student_id int NOT NULL,
 	solution_file_url nvarchar(512) NULL,
 	student_comment nvarchar(512) NULL,
-	upload_date datetime DEFAULT() NOT NULL,
+	upload_date datetime DEFAULT(GETDATE()) NOT NULL,
 	
 	grade tinyint NULL,
 	teacher_comment nvarchar(512) NULL,
 	check_date datetime NULL,
 	
-	CONSTRAINT CK_homework_grade CHECK(grade >= 1 AND <= 12),
+	CONSTRAINT CK_homework_grade CHECK(grade >= 1 AND grade <= 12),
 	CONSTRAINT FK_solutions_homework FOREIGN KEY(homework_id ) REFERENCES homeworks(id),
 	CONSTRAINT FK_solutions_student FOREIGN KEY(student_id) REFERENCES students(id),
 	CONSTRAINT UQ_student_homework UNIQUE(homework_id, student_id)
